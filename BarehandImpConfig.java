@@ -1,20 +1,80 @@
 package net.runelite.client.plugins.barehandimp;
 
-import net.runelite.client.config.*;
-import java.awt.Color;
+import net.runelite.api.Client;
+import net.runelite.api.NPC;
+import net.runelite.api.Skill;
+import net.runelite.client.ui.overlay.*;
+import net.runelite.client.ui.overlay.components.PanelComponent;
 
-@ConfigGroup("barehandimp")
-public interface BarehandImpConfig extends Config
+import javax.inject.Inject;
+import java.awt.*;
+
+public class BarehandImpOverlay extends Overlay
 {
-    @ConfigItem(
-            keyName = "highlightColor",
-            name = "Highlight Color",
-            description = "Set the color of the highlight for Imps",
-            position = 0
-    )
-    default Color highlightColor()
+    private final Client client;
+    private final BarehandImpConfig config;
+
+    @Inject
+    public BarehandImpOverlay(Client client, BarehandImpConfig config)
     {
-        return Color.YELLOW;
+        this.client = client;
+        this.config = config;
+        setPosition(OverlayPosition.DYNAMIC);
+        setPriority(OverlayPriority.HIGH);
     }
 
+    @Override
+    public Dimension render(Graphics2D graphics)
+    {
+        for (NPC npc : client.getNpcs())
+        {
+            if (npc.getName() != null && canBarehandCatch(npc))
+            {
+                renderHighlight(graphics, npc);
+            }
+        }
+        return null;
+    }
+
+    private boolean canBarehandCatch(NPC npc)
+    {
+        String name = npc.getName();
+        int hunterLevel = client.getRealSkillLevel(Skill.HUNTER);
+
+        //Mapping imp types to required Hunter levels for barehand catching
+        switch (name)
+        {
+            case "Baby impling":
+                return hunterLevel >= 17;
+            case "Young impling":
+                return hunterLevel >= 22;
+            case "Gourmet impling":
+                return hunterLevel >= 28;
+            case "Earth impling":
+                return hunterLevel >= 36;
+            case "Essence impling":
+                return hunterLevel >= 42;
+            case "Eclectic impling":
+                return hunterLevel >= 50;
+            case "Nature impling":
+                return hunterLevel >= 58;
+            case "Magpie impling":
+                return hunterLevel >= 65;
+            case "Ninja impling":
+                return hunterLevel >= 74;
+            case "Dragon impling":
+                return hunterLevel >= 83;
+            default:
+                return false;
+        }
+    }
+
+    private void renderHighlight(Graphics2D graphics, NPC npc)
+    {
+        Shape shape = npc.getConvexHull();
+        if (shape != null)
+        {
+            OverlayUtil.renderPolygon(graphics, shape, config.highlightColor());
+        }
+    }
 }
