@@ -1,19 +1,20 @@
 package net.runelite.client.plugins.barehandimp;
 
-import net.runelite.client.config.Config;
-import net.runelite.client.config.ConfigGroup;
-import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.*;
 import java.awt.Color;
 
 @ConfigGroup("barehandimp")
-public interface BarehandImpConfig extends Config {
-
+public interface BarehandImpConfig extends Config
+{
     @ConfigItem(
             keyName = "highlightColor",
             name = "Highlight Color",
-            description = "The color to highlight imps you can catch"
+            description = "Set the color of the highlight for Imps",
+            position = 0
     )
-    default Color highlightColor() {
-        return Color.GREEN;
+    default Color highlightColor()
+    {
+        return Color.YELLOW;
     }
+
 }
